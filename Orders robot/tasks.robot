@@ -6,9 +6,12 @@ Library    RPA.Browser.Selenium
 Library    RPA.Tables
 Library    RPA.HTTP
 Library    RPA.PDF
+Library    RPA.Archive
+Library    RPA.FileSystem
 
 *** Variables ***
 ${PDF_TEMP_OUTPUT_DIRECTORY}=    ${CURDIR}${/}output${/}temp
+${OUTPUT_DIRECTORY}=    ${CURDIR}${/}output
 
 *** Keywords ***
 Open the robot order website
@@ -50,21 +53,21 @@ Store the receipt as a PDF file
     [Arguments]    ${row}
     Wait Until Element Is Visible    class:alert-success
     ${order_receipt_html}=    Get Element Attribute    class:alert-success    outerHTML
-    Html To Pdf    ${order_receipt_html}    ${CURDIR}${/}output${/}receipt_${row}.pdf
+    Html To Pdf    ${order_receipt_html}    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}receipt_${row}.pdf
  
 *** Keywords ***
 Take a screenshot of the robot
     [Arguments]    ${row}
-    Screenshot    id:robot-preview-image    ${CURDIR}${/}output${/}picture_${row}.png
+    Screenshot    id:robot-preview-image    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}picture_${row}.png
     
 
 *** Keywords ***
 Embed the robot screenshot to the receipt PDF file
     [Arguments]    ${screenshot}    ${pdf}    ${row}
     ${files}=    Create List
-    ...    ${CURDIR}${/}output${/}receipt_${row}.pdf
-    ...    ${CURDIR}${/}output${/}picture_${row}.png:align=center
-    Add Files To Pdf    ${files}    ${CURDIR}${/}output${/}embedded_${row}.pdf    
+    ...    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}receipt_${row}.pdf
+    ...    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}picture_${row}.png:align=center
+    Add Files To Pdf    ${files}    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}embedded_${row}.pdf    
 
 *** Keywords ***
 Go to order another robot
@@ -72,6 +75,11 @@ Go to order another robot
 
 *** Keywords ***
 Create a ZIP file of the receipts
+    ${zip_file_name}=    Set Variable    ${OUTPUT_DIRECTORY}${/}PDFs.zip
+    Archive Folder With Zip
+    ...    ${PDF_TEMP_OUTPUT_DIRECTORY}
+    ...    ${zip_file_name}
+    Remove Directory    ${PDF_TEMP_OUTPUT_DIRECTORY}    True
 
 *** Tasks ***
 Order robots from RobotSpareBin Industries Inc
@@ -87,4 +95,4 @@ Order robots from RobotSpareBin Industries Inc
         Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}    ${row}[Order number]
         Go to order another robot
     END
-    #Create a ZIP file of the receipts
+    Create a ZIP file of the receipts
