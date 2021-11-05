@@ -8,6 +8,7 @@ Library    RPA.HTTP
 Library    RPA.PDF
 Library    RPA.Archive
 Library    RPA.FileSystem
+Library    RPA.Robocorp.Vault
 
 *** Variables ***
 ${PDF_TEMP_OUTPUT_DIRECTORY}=    ${CURDIR}${/}output${/}temp
@@ -15,11 +16,15 @@ ${OUTPUT_DIRECTORY}=    ${CURDIR}${/}output
 
 *** Keywords ***
 Open the robot order website
-    Open Available Browser    https://robotsparebinindustries.com/#/robot-order
+    ${secret}=    Get Secret    URLs
+    #Open Available Browser    https://robotsparebinindustries.com/#/robot-order
+    Open Available Browser    ${secret}[order-url]
 
 *** Keywords ***
 Get orders   
-    Download    https://robotsparebinindustries.com/orders.csv    overwrite=True
+    ${secret}=    Get Secret    URLs
+    #Download    https://robotsparebinindustries.com/orders.csv    overwrite=True
+    Download    ${secret}[download-url]    overwrite=True
     ${orders}=    Read table from CSV    orders.csv    header=True
     [Return]    ${orders}
 
