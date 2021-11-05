@@ -7,6 +7,9 @@ Library    RPA.Tables
 Library    RPA.HTTP
 Library    RPA.PDF
 
+*** Variables ***
+${PDF_TEMP_OUTPUT_DIRECTORY}=    ${CURDIR}${/}output${/}temp
+
 *** Keywords ***
 Open the robot order website
     Open Available Browser    https://robotsparebinindustries.com/#/robot-order
@@ -66,6 +69,9 @@ Embed the robot screenshot to the receipt PDF file
 *** Keywords ***
 Go to order another robot
     Wait Until Keyword Succeeds    3x    1s    Click Button    id:order-another
+
+*** Keywords ***
+Create a ZIP file of the receipts
 
 *** Tasks ***
 Order robots from RobotSpareBin Industries Inc
