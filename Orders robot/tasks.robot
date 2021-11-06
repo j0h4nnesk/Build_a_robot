@@ -9,21 +9,27 @@ Library    RPA.PDF
 Library    RPA.Archive
 Library    RPA.FileSystem
 Library    RPA.Robocorp.Vault
+Library    RPA.Dialogs
 
 *** Variables ***
 ${PDF_TEMP_OUTPUT_DIRECTORY}=    ${CURDIR}${/}output${/}temp
 ${OUTPUT_DIRECTORY}=    ${CURDIR}${/}output
 
 *** Keywords ***
-Open the robot order website
-    ${secret}=    Get Secret    URLs
-    #Open Available Browser    https://robotsparebinindustries.com/#/robot-order
-    Open Available Browser    ${secret}[order-url]
+Get order website from dialogue
+    Add heading    Please give URL address
+    Add text input    URL    label=URL address
+    ${result}=    Run dialog
+    [Return]    ${result}
 
 *** Keywords ***
-Get orders   
+Open the robot order website
+    [Arguments]    ${result}
+    Open Available Browser    ${result}[URL]
+
+*** Keywords ***
+Get orders
     ${secret}=    Get Secret    URLs
-    #Download    https://robotsparebinindustries.com/orders.csv    overwrite=True
     Download    ${secret}[download-url]    overwrite=True
     ${orders}=    Read table from CSV    orders.csv    header=True
     [Return]    ${orders}
@@ -88,7 +94,8 @@ Create a ZIP file of the receipts
 
 *** Tasks ***
 Order robots from RobotSpareBin Industries Inc
-    Open the robot order website
+    ${result}=    Get order website from dialogue
+    Open the robot order website    ${result}
     ${orders}=    Get orders
     FOR    ${row}    IN    @{orders}
         Close the annoying modal
