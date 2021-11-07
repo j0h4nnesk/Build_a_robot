@@ -64,20 +64,23 @@ Store the receipt as a PDF file
     [Arguments]    ${row}
     Wait Until Element Is Visible    class:alert-success
     ${order_receipt_html}=    Get Element Attribute    class:alert-success    outerHTML
-    Html To Pdf    ${order_receipt_html}    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}receipt_${row}.pdf
- 
+    ${pdf}=    Set Variable    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}receipt_${row}.pdf
+    Html To Pdf    ${order_receipt_html}    ${pdf}
+    [Return]    ${pdf}    
+
 *** Keywords ***
 Take a screenshot of the robot
     [Arguments]    ${row}
-    Screenshot    id:robot-preview-image    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}picture_${row}.png
-    
+    ${screenshot}=    Set Variable    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}picture_${row}.png 
+    Screenshot    id:robot-preview-image    ${screenshot}
+    [Return]    ${screenshot}
 
 *** Keywords ***
 Embed the robot screenshot to the receipt PDF file
     [Arguments]    ${screenshot}    ${pdf}    ${row}
     ${files}=    Create List
-    ...    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}receipt_${row}.pdf
-    ...    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}picture_${row}.png:align=center
+    ...    ${pdf}    
+    ...    ${screenshot}        
     Add Files To Pdf    ${files}    ${PDF_TEMP_OUTPUT_DIRECTORY}${/}embedded_${row}.pdf    
 
 *** Keywords ***
@@ -108,3 +111,4 @@ Order robots from RobotSpareBin Industries Inc
         Go to order another robot
     END
     Create a ZIP file of the receipts
+    #https://robotsparebinindustries.com/#/robot-order
